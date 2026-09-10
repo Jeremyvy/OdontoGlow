@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OdontoGlow</title>
+  <style>
+    :root {
+      --bg: #f5efee;
+      --card: rgba(255,255,255,0.72);
+      --soft: #f5dfe7;
+      --rose: #e8b9c7;
+      --rose-deep: #d998a9;
+      --rose-dark: #7f4d5d;
+      --text: #2b1f22;
+      --muted: #7b5f64;
+      --line: rgba(127,77,93,0.18);
+      --shadow: 0 20px 40px rgba(127,77,93,0.14);
+      --success: #8bbd9b;
+      --warning: #f3d9a2;
+      --danger: #d98da1;
+      --dark: #2d2023;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.35), transparent 30%),
+        var(--bg);
+    }
+
+    .app {
+      width: min(100%, 1180px);
+      background: rgba(255,255,255,0.12);
+      border-radius: 32px;
+      padding: 18px;
+    }
+
+    .login-shell {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 20px 18px 22px;
+      background: rgba(255,255,255,0.38);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .login-shell h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.5rem, 2vw, 2rem);
+      text-align: center;
+      color: var(--rose-dark);
+    }
+
+    .login-shell p {
+      margin: 0 0 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--rose-dark);
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.76);
+      border-radius: 12px;
+      padding: 12px 13px;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(127,77,93,0.45);
+      box-shadow: 0 0 0 4px rgba(232,185,199,0.18);
+    }
+
+    button {
+      border: none;
+      width: 100%;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--rose-deep), var(--rose-dark));
+      color: white;
+      padding: 13px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(127,77,93,0.18);
+    }
+
+    .hidden { display: none !important; }
+
+    .dashboard {
+      display: none;
+      background: rgba(255,255,255,0.3);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .dashboard.visible { display: block; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bell-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(127,77,93,0.08);
+      cursor: pointer;
+    }
+
+    .bell {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .alert-dot {
+      position: absolute;
+      top: 7px;
+      right: 8px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #dc7a8d;
+      border: 2px solid white;
+      display: none;
+    }
+
+    .alert-dot.visible {
+      display: block;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2vw, 2.2rem);
+      color: var(--rose-dark);
+    }
+
+    .logout-btn {
+      width: auto;
+      background: #f3dfe7;
+      color: var(--rose-dark);
+      border: 1px solid rgba(127,77,93,0.12);
+      box-shadow: none;
+      padding: 10px 14px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px 12px;
+      text-align: center;
+    }
+
+    .card span {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .card strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--rose-dark);
+      font-size: 1.8rem;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.58);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .panel h3 {
+      margin: 0 0 14px;
+      color: var(--rose-dark);
+      font-size: 1.2rem;
+    }
+
+    .inline-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .calendar-box {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .calendar-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+
+    .calendar-head h4 {
+      margin: 0;
+      color: var(--dark);
+      font-size: 1.1rem;
+    }
+
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .calendar-nav button {
+      width: auto;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #f4dfe8;
+      color: var(--rose-dark);
+      box-shadow: none;
+    }
+
+    .weekdays, .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .weekdays div {
+      text-align: center;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      padding-bottom: 6px;
+    }
+
+    .day {
+      min-height: 52px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: rgba(245, 223, 231, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      color: var(--dark);
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .day.muted {
+      opacity: 0.45;
+    }
+
+    .day.selected {
+      background: linear-gradient(135deg, var(--rose-deep), var(--rose-dark));
+      color: white;
+    }
+
+    .day.has-event::after {
+      content: "";
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--rose-dark);
+      bottom: 7px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .day.selected.has-event::after {
+      background: white;
+    }
+
+    .list-panel {
+      margin-top: 18px;
+    }
+
+    .list-panel .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter {
+      width: 180px;
+    }
+
+    .appointment-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .appointment-item {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--rose-deep);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .appointment-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .appointment-item h4 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--dark);
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.67rem;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .status.pendiente { background: var(--warning); color: #7f5a0e; }
+    .status.confirmada { background: #dff3e5; color: #365d45; }
+    .status.cancelada { background: #f8dfe4; color: #7a4655; }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.6;
+    }
+
+    .tiny-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .tiny-btn {
+      width: auto;
+      padding: 8px 10px;
+      font-size: 0.75rem;
+      border-radius: 10px;
+    }
+
+    .tiny-btn.green { background: linear-gradient(135deg, #8fc7a1, #73a382); }
+    .tiny-btn.neutral { background: #f3dfe6; color: var(--rose-dark); }
+    .tiny-btn.red { background: linear-gradient(135deg, #d88ea4, #b45f75); }
+
+    .empty {
+      text-align: center;
+      padding: 18px 12px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.45);
+    }
+
+    @media (max-width: 900px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .summary {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 14px;
+      }
+      .app {
+        padding: 12px;
+      }
+      .summary {
+        grid-template-columns: 1fr;
+      }
+      .inline-grid {
+        grid-template-columns: 1fr;
+      }
+      .calendar-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .day {
+        min-height: 42px;
+      }
+    }
+  </style>
+
+  <meta name="theme-color" content="#d998a9" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="OdontoGlow" />
+  <link rel="manifest" href="manifest.json" />
+
+</head>
+<body>
+  <div class="app">
+    <section id="loginSection" class="login-shell">
+      <h2>OdontoGlow</h2>
+      <p>Acceso exclusivo para la clínica</p>
+
+      <div class="field">
+        <label for="usuario">Usuario</label>
+        <input id="usuario" type="text" value="drayasmilguzman" />
+      </div>
+
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input id="password" type="password" placeholder="Ingrese su contraseña" />
+      </div>
+
+      <button id="loginBtn">Ingresar</button>
+    </section>
+
+    <section id="dashboardSection" class="dashboard">
+      <div class="topbar">
+        <h1>Agenda OdontoGlow</h1>
+        <div class="topbar-right">
+          <div id="bellButton" class="bell-wrap" title="Avisos">
+            <span class="bell">🔔</span>
+            <span id="alertDot" class="alert-dot visible"></span>
+          </div>
+          <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="card">
+          <span>Total</span>
+          <strong id="totalCitas">0</strong>
+        </div>
+        <div class="card">
+          <span>Pendientes</span>
+          <strong id="pendientes">0</strong>
+        </div>
+        <div class="card">
+          <span>Confirmadas</span>
+          <strong id="confirmadas">0</strong>
+        </div>
+        <div class="card">
+          <span>Canceladas</span>
+          <strong id="canceladas">0</strong>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="panel">
+          <h3>Nueva cita</h3>
+          <form id="appointmentForm">
+            <div class="inline-grid">
+              <div class="field">
+                <label for="nombre">Nombre</label>
+                <input id="nombre" name="nombre" type="text" placeholder="Ej. Ana García" required />
+              </div>
+              <div class="field">
+                <label for="telefono">Teléfono</label>
+                <input id="telefono" name="telefono" type="tel" placeholder="Ej. 3001234567" required />
+              </div>
+            </div>
+
+            <div class="inline-grid">
+              <div class="field">
+                <label for="servicio">Servicio</label>
+                <input id="servicio" name="servicio" type="text" placeholder="Ej. Limpieza dental" required />
+              </div>
+              <div class="field">
+                <label for="doctor">Doctora</label>
+                <input id="doctor" name="doctor" type="text" value="Dra. Yasmil Guzmán" readonly />
+              </div>
+            </div>
+
+            <div class="inline-grid">
+              <div class="field">
+                <label for="fecha">Fecha</label>
+                <input id="fecha" name="fecha" type="date" required />
+              </div>
+              <div class="field">
+                <label for="hora">Hora</label>
+                <input id="hora" name="hora" type="text" placeholder="Ej. 10:30 AM" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="notas">Notas</label>
+              <textarea id="notas" name="notas" placeholder="Describe alguna necesidad o detalle importante."></textarea>
+            </div>
+
+            <button type="submit">Guardar cita</button>
+          </form>
+        </div>
+
+        <div class="panel calendar-box">
+          <div class="calendar-head">
+            <h4 id="monthLabel">Mes</h4>
+            <div class="calendar-nav">
+              <button id="prevMonth" type="button">‹</button>
+              <button id="nextMonth" type="button">›</button>
+            </div>
+          </div>
+          <div class="weekdays">
+            <div>Dom</div>
+            <div>Lun</div>
+            <div>Mar</div>
+            <div>Mié</div>
+            <div>Jue</div>
+            <div>Vie</div>
+            <div>Sáb</div>
+          </div>
+          <div id="calendarDays" class="days-grid"></div>
+        </div>
+      </div>
+
+      <div class="panel list-panel">
+        <div class="header">
+          <h3>Todas las citas</h3>
+          <select id="statusFilter" class="filter">
+            <option value="todos">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+
+        <div id="appointmentList" class="appointment-list"></div>
+      </div>
+
+      <div class="panel list-panel" style="margin-top: 18px;">
+        <div class="header">
+          <h3>Recordatorios y pendientes</h3>
+          <button id="addReminderBtn" type="button" class="tiny-btn neutral" style="width: auto;">+ Añadir</button>
+        </div>
+
+        <div id="reminderList" class="appointment-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const USER = 'drayasmilguzman';
+    const PASS = '091505';
+    const STORAGE_KEY = 'odontoglow_agenda_v1';
+
+    const state = {
+      citas: [],
+      reminders: [],
+      currentMonth: new Date().getMonth(),
+      currentYear: new Date().getFullYear(),
+      selectedDate: null
+    };
+
+    const loginSection = document.getElementById('loginSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    const appointmentForm = document.getElementById('appointmentForm');
+    const appointmentList = document.getElementById('appointmentList');
+    const reminderList = document.getElementById('reminderList');
+    const statusFilter = document.getElementById('statusFilter');
+    const calendarDays = document.getElementById('calendarDays');
+    const monthLabel = document.getElementById('monthLabel');
+    const alertDot = document.getElementById('alertDot');
+
+    function seedCitas() {
+      const addDays = (days) => {
+        const d = new Date();
+        d.setDate(d.getDate() + days);
+        return d.toISOString().split('T')[0];
+      };
+
+      return [
+        {
+          id: crypto.randomUUID(),
+          nombre: 'María López',
+          telefono: '3001234567',
+          servicio: 'Limpieza dental',
+          doctor: 'Dra. Yasmil Guzmán',
+          fecha: addDays(1),
+          hora: '10:30 AM',
+          notas: 'Primera visita',
+          estado: 'pendiente'
+        },
+        {
+          id: crypto.randomUUID(),
+          nombre: 'Sofía Ramírez',
+          telefono: '3109876543',
+          servicio: 'Blanqueamiento',
+          doctor: 'Dra. Yasmil Guzmán',
+          fecha: addDays(3),
+          hora: '02:00 PM',
+          notas: 'Control de tono',
+          estado: 'confirmada'
+        },
+        {
+          id: crypto.randomUUID(),
+          nombre: 'Carlos Ortega',
+          telefono: '3201237788',
+          servicio: 'Ortodoncia',
+          doctor: 'Dra. Yasmil Guzmán',
+          fecha: addDays(10),
+          hora: '09:15 AM',
+          notas: 'Revisión',
+          estado: 'pendiente'
+        }
+      ];
+    }
+
+    function loadCitas() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        state.citas = JSON.parse(saved);
+      } else {
+        state.citas = seedCitas();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.citas));
+      }
+    }
+
+    function saveCitas() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.citas));
+    }
+
+    function loadReminders() {
+      const saved = localStorage.getItem('odontoglow_reminders');
+      state.reminders = saved ? JSON.parse(saved) : [
+        { id: crypto.randomUUID(), text: 'Confirmar material de blanqueamiento', done: false },
+        { id: crypto.randomUUID(), text: 'Llamar a paciente de revisión', done: false },
+        { id: crypto.randomUUID(), text: 'Actualizar inventario de kit de higiene', done: true }
+      ];
+      saveReminders();
+    }
+
+    function saveReminders() {
+      localStorage.setItem('odontoglow_reminders', JSON.stringify(state.reminders));
+    }
+
+    function updateBell() {
+      const pending = state.reminders.some(item => !item.done);
+      alertDot.classList.toggle('visible', pending);
+    }
+
+    function formatDate(value) {
+      if (!value) return 'Sin fecha';
+      const date = new Date(value + 'T00:00:00');
+      return date.toLocaleDateString('es-ES', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+
+    function renderSummary() {
+      document.getElementById('totalCitas').textContent = state.citas.length;
+      document.getElementById('pendientes').textContent = state.citas.filter(c => c.estado === 'pendiente').length;
+      document.getElementById('confirmadas').textContent = state.citas.filter(c => c.estado === 'confirmada').length;
+      document.getElementById('canceladas').textContent = state.citas.filter(c => c.estado === 'cancelada').length;
+    }
+
+    function getFilteredCitas() {
+      const filter = statusFilter.value;
+      const date = state.selectedDate;
+      let list = [...state.citas];
+
+      if (filter !== 'todos') {
+        list = list.filter(c => c.estado === filter);
+      }
+
+      if (date) {
+        list = list.filter(c => c.fecha === date);
+      }
+
+      return list.sort((a, b) => new Date(a.fecha + 'T00:00:00') - new Date(b.fecha + 'T00:00:00'));
+    }
+
+    function renderAppointments() {
+      const citas = getFilteredCitas();
+
+      if (!citas.length) {
+        appointmentList.innerHTML = '<div class="empty">No hay citas para este filtro.</div>';
+        return;
+      }
+
+      appointmentList.innerHTML = citas.map((cita) => `
+        <article class="appointment-item">
+          <div class="appointment-top">
+            <h4>${cita.nombre}</h4>
+            <span class="status ${cita.estado}">${cita.estado}</span>
+          </div>
+          <div class="meta">
+            <span>${cita.servicio}</span>
+            <span>${cita.doctor}</span>
+          </div>
+          <div class="meta">
+            <span>${formatDate(cita.fecha)}</span>
+            <span>${cita.hora}</span>
+            <span>${cita.telefono}</span>
+          </div>
+          ${cita.notas ? `<div class="meta"><span>Nota: ${cita.notas}</span></div>` : ''}
+          <div class="tiny-actions">
+            <button class="tiny-btn green" data-action="confirm" data-id="${cita.id}" type="button">Confirmar</button>
+            <button class="tiny-btn neutral" data-action="pending" data-id="${cita.id}" type="button">Pendiente</button>
+            <button class="tiny-btn red" data-action="cancel" data-id="${cita.id}" type="button">Cancelar</button>
+            <button class="tiny-btn red" data-action="delete" data-id="${cita.id}" type="button">Eliminar</button>
+          </div>
+        </article>
+      `).join('');
+
+      appointmentList.querySelectorAll('button[data-action]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const itemIndex = state.citas.findIndex(c => c.id === button.dataset.id);
+          if (itemIndex === -1) return;
+
+          if (button.dataset.action === 'delete') {
+            const confirmed = window.confirm('¿Deseas eliminar esta cita?');
+            if (!confirmed) return;
+            state.citas.splice(itemIndex, 1);
+          } else {
+            const item = state.citas[itemIndex];
+            if (button.dataset.action === 'confirm') item.estado = 'confirmada';
+            if (button.dataset.action === 'pending') item.estado = 'pendiente';
+            if (button.dataset.action === 'cancel') item.estado = 'cancelada';
+          }
+
+          saveCitas();
+          renderApp();
+        });
+      });
+    }
+
+    function renderCalendar() {
+      const firstDay = new Date(state.currentYear, state.currentMonth, 1);
+      const lastDay = new Date(state.currentYear, state.currentMonth + 1, 0);
+      const startDay = firstDay.getDay();
+      const daysInMonth = lastDay.getDate();
+      const prevMonthDays = new Date(state.currentYear, state.currentMonth, 0).getDate();
+
+      monthLabel.textContent = new Date(state.currentYear, state.currentMonth, 1).toLocaleDateString('es-ES', {
+        month: 'long',
+        year: 'numeric'
+      });
+
+      const dateSet = new Set(state.citas.map(c => c.fecha));
+      const cells = [];
+
+      for (let i = startDay - 1; i >= 0; i--) {
+        cells.push({ day: prevMonthDays - i, muted: true });
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const isoDate = `${state.currentYear}-${String(state.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        cells.push({
+          day,
+          muted: false,
+          isoDate,
+          hasEvent: dateSet.has(isoDate),
+          selected: state.selectedDate === isoDate
+        });
+      }
+
+      while (cells.length % 7 !== 0) {
+        cells.push({ day: cells.length, muted: true });
+      }
+
+      calendarDays.innerHTML = cells.map((cell) => {
+        if (!cell.isoDate) {
+          return `<div class="day muted">${cell.day}</div>`;
+        }
+
+        const classes = ['day'];
+        if (cell.muted) classes.push('muted');
+        if (cell.hasEvent) classes.push('has-event');
+        if (cell.selected) classes.push('selected');
+
+        return `<div class="${classes.join(' ')}" data-date="${cell.isoDate}">${cell.day}</div>`;
+      }).join('');
+
+      calendarDays.querySelectorAll('.day[data-date]').forEach((dayEl) => {
+        dayEl.addEventListener('click', () => {
+          const clickedDate = dayEl.dataset.date;
+          state.selectedDate = state.selectedDate === clickedDate ? null : clickedDate;
+          renderApp();
+        });
+      });
+    }
+
+    function renderReminders() {
+      if (!state.reminders.length) {
+        reminderList.innerHTML = '<div class="empty">No tienes recordatorios pendientes.</div>';
+        updateBell();
+        return;
+      }
+
+      reminderList.innerHTML = state.reminders.map((item) => `
+        <div class="appointment-item" style="border-left-color:${item.done ? '#8bbd9b' : '#d998a9'};">
+          <div class="appointment-top">
+            <h4 style="text-decoration:${item.done ? 'line-through' : 'none'}; opacity:${item.done ? '0.7' : '1'};">${item.text}</h4>
+            <span class="status ${item.done ? 'confirmada' : 'pendiente'}">${item.done ? 'Hecho' : 'Pendiente'}</span>
+          </div>
+          <div class="tiny-actions">
+            <button class="tiny-btn green" type="button" data-reminder-action="toggle" data-reminder-id="${item.id}">${item.done ? 'Marcar pendiente' : 'Marcar hecho'}</button>
+            <button class="tiny-btn red" type="button" data-reminder-action="delete" data-reminder-id="${item.id}">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+
+      reminderList.querySelectorAll('[data-reminder-action]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const reminderId = button.dataset.reminderId;
+          const reminder = state.reminders.find(item => item.id === reminderId);
+          if (!reminder) return;
+
+          if (button.dataset.reminderAction === 'toggle') {
+            reminder.done = !reminder.done;
+          }
+
+          if (button.dataset.reminderAction === 'delete') {
+            state.reminders = state.reminders.filter(item => item.id !== reminderId);
+          }
+
+          saveReminders();
+          updateBell();
+          renderReminders();
+        });
+      });
+
+      updateBell();
+    }
+
+    function renderApp() {
+      renderSummary();
+      renderCalendar();
+      renderAppointments();
+      renderReminders();
+    }
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      state.currentMonth -= 1;
+      if (state.currentMonth < 0) {
+        state.currentMonth = 11;
+        state.currentYear -= 1;
+      }
+      renderApp();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      state.currentMonth += 1;
+      if (state.currentMonth > 11) {
+        state.currentMonth = 0;
+        state.currentYear += 1;
+      }
+      renderApp();
+    });
+
+    statusFilter.addEventListener('change', () => {
+      renderAppointments();
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      const user = document.getElementById('usuario').value.trim();
+      const pass = document.getElementById('password').value.trim();
+
+      if (user === USER && pass === PASS) {
+        loginSection.classList.add('hidden');
+        dashboardSection.classList.add('visible');
+        renderApp();
+      } else {
+        alert('Usuario o contraseña incorrectos.');
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      document.getElementById('password').value = '';
+      loginSection.classList.remove('hidden');
+      dashboardSection.classList.remove('visible');
+    });
+
+    document.getElementById('bellButton').addEventListener('click', () => {
+      const pending = state.reminders.filter(item => !item.done);
+      if (!pending.length) {
+        alert('No tienes avisos pendientes.');
+        return;
+      }
+      alert(pending.map(item => '• ' + item.text).join('\n'));
+    });
+
+    document.getElementById('addReminderBtn').addEventListener('click', () => {
+      const text = window.prompt('Escribe el recordatorio o pendiente:');
+      if (!text || !text.trim()) return;
+      state.reminders.unshift({
+        id: crypto.randomUUID(),
+        text: text.trim(),
+        done: false
+      });
+      saveReminders();
+      renderReminders();
+    });
+
+    appointmentForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(appointmentForm);
+      const cita = {
+        id: crypto.randomUUID(),
+        nombre: formData.get('nombre').toString().trim(),
+        telefono: formData.get('telefono').toString().trim(),
+        servicio: formData.get('servicio').toString().trim(),
+        doctor: 'Dra. Yasmil Guzmán',
+        fecha: formData.get('fecha').toString(),
+        hora: formData.get('hora').toString().trim(),
+        notas: formData.get('notas').toString().trim(),
+        estado: 'pendiente'
+      };
+
+      if (!cita.nombre || !cita.telefono || !cita.servicio || !cita.fecha || !cita.hora) {
+        alert('Completa todos los campos obligatorios.');
+        return;
+      }
+
+      state.citas.push(cita);
+      saveCitas();
+      appointmentForm.reset();
+      state.selectedDate = cita.fecha;
+      renderApp();
+      alert('Cita agendada correctamente.');
+    });
+
+    // ==========================
+    // NOTIFICACIONES ODONTOGLOW
+    // ==========================
+    const notifyBtn = document.getElementById('notifyBtn');
+
+    function updateNotificationButton() {
+      if (!('Notification' in window)) {
+        notifyBtn.textContent = '🔕 Notificaciones no disponibles';
+        notifyBtn.disabled = true;
+        return;
+      }
+
+      if (Notification.permission === 'granted') {
+        notifyBtn.textContent = '🔔 Notificaciones activadas';
+      } else if (Notification.permission === 'denied') {
+        notifyBtn.textContent = '🔕 Notificaciones bloqueadas';
+      } else {
+        notifyBtn.textContent = '🔔 Activar notificaciones';
+      }
+    }
+
+    async function requestNotifications() {
+      if (!('Notification' in window)) {
+        alert('Este dispositivo o navegador no permite notificaciones.');
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      updateNotificationButton();
+
+      if (permission === 'granted') {
+        new Notification('OdontoGlow', {
+          body: 'Las notificaciones de recordatorios están activadas.',
+          icon: 'icon-192.png'
+        });
+      }
+    }
+
+    function showNotification(title, body) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+          registration.showNotification(title, {
+            body,
+            icon: 'icon-192.png',
+            badge: 'icon-192.png',
+            tag: 'odontoglow-reminder'
+          });
+        }).catch(() => {
+          new Notification(title, { body, icon: 'icon-192.png' });
+        });
+      } else {
+        new Notification(title, { body, icon: 'icon-192.png' });
+      }
+    }
+
+    function checkAppointmentReminders() {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+
+      state.citas.forEach(cita => {
+        if (cita.estado === 'cancelada' || cita.fecha !== today) return;
+
+        // Intenta interpretar formatos como 10:30 AM o 02:00 PM.
+        const match = String(cita.hora).trim().match(/^(\\d{1,2}):(\\d{2})\\s*(AM|PM)$/i);
+        if (!match) return;
+
+        let hour = Number(match[1]);
+        const minute = Number(match[2]);
+        const period = match[3].toUpperCase();
+
+        if (period === 'PM' && hour !== 12) hour += 12;
+        if (period === 'AM' && hour === 12) hour = 0;
+
+        const appointment = new Date(now);
+        appointment.setHours(hour, minute, 0, 0);
+
+        const minutesUntil = Math.round((appointment - now) / 60000);
+        const key = `odontoglow-notified-${cita.id}-${today}`;
+
+        // Aviso 30 minutos antes.
+        if (minutesUntil >= 29 && minutesUntil <= 31 && !localStorage.getItem(key + '-30')) {
+          showNotification(
+            'Cita en 30 minutos',
+            `${cita.nombre} — ${cita.servicio} a las ${cita.hora}.`
+          );
+          localStorage.setItem(key + '-30', '1');
+        }
+
+        // Aviso al momento de la cita.
+        if (minutesUntil >= -1 && minutesUntil <= 1 && !localStorage.getItem(key + '-now')) {
+          showNotification(
+            'Cita ahora',
+            `${cita.nombre} tiene una cita de ${cita.servicio}.`
+          );
+          localStorage.setItem(key + '-now', '1');
+        }
+      });
+    }
+
+    function checkReminderNotifications() {
+      const pending = state.reminders.filter(item => !item.done);
+      const today = new Date().toISOString().split('T')[0];
+
+      pending.forEach(item => {
+        const key = `odontoglow-reminder-notified-${item.id}-${today}`;
+        if (!localStorage.getItem(key)) {
+          // Solo avisa una vez por día mientras el recordatorio siga pendiente.
+          showNotification('Recordatorio OdontoGlow', item.text);
+          localStorage.setItem(key, '1');
+        }
+      });
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+
+    notifyBtn.addEventListener('click', requestNotifications);
+    updateNotificationButton();
+
+    loadCitas();
+    loadReminders();
+    state.selectedDate = null;
+    renderApp();
+
+    // Comprobación mientras la aplicación está abierta.
+    setInterval(() => {
+      checkAppointmentReminders();
+      checkReminderNotifications();
+    }, 30000);
+  </script>
+</body>
+</html>
